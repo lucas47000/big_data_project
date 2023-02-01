@@ -1,6 +1,6 @@
 FROM microsoft/windowsservercore
 
-#  variable d'environnement HADOOP_HOME
+#  variable d'environnement HADOOP_HOME goatesque
 ENV HADOOP_HOME /usr/local/hadoop
 
 # Installez les dépendances nécessaires
