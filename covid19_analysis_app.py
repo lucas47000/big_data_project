@@ -1,3 +1,4 @@
+import subprocess
 import requests
 from pyspark.sql import SparkSession
 
@@ -9,11 +10,14 @@ with open(file_name, "wb") as f:
 
 print("Le fichier a été téléchargé avec succès sous le nom : " + file_name)
 
-# Initialise SparkSession
-spark = SparkSession.builder.appName("Covid19DataAnalysis").getOrCreate()
+# 1. Initialiser SparkSession avec la configuration pour HDFS
+spark = SparkSession.builder.appName("Covid19DataAnalysis").config("spark.hadoop.fs.defaultFS", "hdfs://localhost:9000").getOrCreate()
 
-# Lis le fichier CSV téléchargé
-df = spark.read.csv(file_name, header=True, inferSchema=True)
+# 2. Copier le fichier CSV téléchargé dans HDFS
+subprocess.run(["hdfs", "dfs", "-put", "covid_19_data.csv", "/"])
+
+# 3. Lire le fichier CSV à partir de HDFS
+df = spark.read.csv("hdfs://localhost:9000/covid_19_data.csv", header=True, inferSchema=True)
 
 # Extrait et affiche le nombre de cas total par pays
 total_cases = df.groupBy("Country").agg({"Confirmed": "sum"})
